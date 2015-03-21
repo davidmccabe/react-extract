@@ -37,53 +37,6 @@ exports.testExtraction = function (test) {
     test.done();
 };
 
-var translations = {
-    'Hello': 'Helo',
-    'world': 'byd',
-    '<a href="foo">tag with only safe attributes</a>': '<a href="bar">Mae tag sydd wedi dim ond priodoleddau sy\'n ddiogel</a>',
-    '<a:link href="foo">tag with unsafe attributes</a:link>': '<a:link href="bar">tag gyda phriodoleddau anniogel</a:link>',
-    '<SelfClosing />': 'Translated: <SelfClosing />',
-    '<SelfClosing:foo />': 'Translated: <SelfClosing:foo />',
-    '<Member.Name />': 'Translated: <Member.Name />',    
-    'Cat: {nested}': 'Cat : {nested}',
-    'hatters': 'hetwyr',
-    'And now {a.member.expression}': 'Ac yn awr {a.member.expression}',
-    '<Re /><Ordering />': '<Ordering /><Re />',
-}
-
-var expectedResultsFromTranslation = {
-    '<I18N>Hello</I18N>': '<I18N>Helo</I18N>;',
-    'i18n("world")': "'byd';",
-    '<I18N><a href="foo">tag with only safe attributes</a></I18N>': '<I18N><a href="bar">Mae tag sydd wedi dim ond priodoleddau sy\'n ddiogel</a></I18N>;',
-    '<I18N><a:link href="foo" target="_blank">tag with unsafe attributes</a:link></I18N>': '<I18N><a target="_blank" href="bar">tag gyda phriodoleddau anniogel</a></I18N>;',
-    '<I18N><a href="foo" target="_blank" i18n-designation="link">tag with unsafe attributes</a></I18N>': '<I18N><a target="_blank" href="bar">tag gyda phriodoleddau anniogel</a></I18N>;',
-    '<I18N><SelfClosing i18n-designation="foo" attr="attr" /></I18N>': '<I18N>Translated: <SelfClosing attr="attr" /></I18N>;',
-    '<I18N><SelfClosing /></I18N>': '<I18N>Translated: <SelfClosing /></I18N>;',
-    '<I18N><Member.Name /></I18N>': '<I18N>Translated: <Member.Name /></I18N>;',
-    '<I18N>Cat: {nested}</I18N>': "<I18N>Cat : {nested}</I18N>;",
-    '<I18N>And now {a.member.expression}</I18N>': '<I18N>Ac yn awr {a.member.expression}</I18N>;',
-    'var nested = i18n("hatters"); <I18N>Cat: {nested}</I18N>': "var nested = 'hetwyr';\n<I18N>Cat : {nested}</I18N>;",
-    '<I18N><Re /><Ordering /></I18N>': '<I18N><Ordering /><Re /></I18N>;',
-}
-
-exports.testTranslation = function (test) {
-    Object.keys(expectedResultsFromTranslation).forEach(original => {
-        try { translator.translateMessages(original, translations) } catch (e) {console.error(e)};
-        test.ok(
-            I.is(I.fromJS(expectedResultsFromTranslation[original]),
-                 I.fromJS(translator.translateMessages(original, translations))),
-                 `
-                 Incorrect translation for original
-                 ${original}
-                 Expected
-                 ${expectedResultsFromTranslation[original]}
-                 but got
-                 ${translator.translateMessages(original, translations)}
-                 `);
-    })
-    test.done();
-}
-
 var shouldNotBeExtractable = [
     '<I18N>Nested <I18N>message markers.</I18N></I18N>',
     'i18n("Not" + "just a string" + "literal")',
@@ -103,43 +56,6 @@ var shouldNotBeExtractable = [
 exports.testErrorsInExtraction = function (test) {
     shouldNotBeExtractable.forEach(message => {
         test.throws(() => translator.extractMessages(message), message);
-    });
-    test.done();
-}
-
-
-var toBeTranslated = `
-function render () {
-    return <p>
-        <I18N>Hello, world. <Component />{foo}{bar.baz}</I18N>
-    </p>
-}
-`
-
-// Translations for above source that should cause errors:
-var invalidTranslations = [
-    '<a target="_blank">Unsafe attribute</a> <Component />{foo}{bar.baz}',
-    '<a:made-up-designation></a:made-up-designation><Component />{foo}{bar.baz}',
-    '{random + expression + in + placeholder}<Component />{foo}{bar.baz}',
-    '{non.existant.name}<Component />{foo}{bar.baz}',
-    '<Component /> Duplicated expressions: {foo}{foo}{bar.baz}',
-    'Missing component. {foo}{foo}{bar.baz}',
-    'Duplicated component. <Component /> <Component /> {foo}{foo}{bar.baz}',
-];
-var correctTranslation = 'Helo, byd. <Component />{foo}{bar.baz}';
-
-exports.testErrorsInTranslation = function (test) {
-    var extraction = translator.extractMessages(toBeTranslated)[0];
-    
-    function translate(translation) {
-        translator.translateMessages(toBeTranslated, {[extraction]: translation})
-    }
-
-    test.doesNotThrow(() => translate(correctTranslation),
-        "Correct translation couldn't be translated.");
-
-    invalidTranslations.forEach(translation => {
-        test.throws(() => translate(translation), translation);
     });
     test.done();
 }

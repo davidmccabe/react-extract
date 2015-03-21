@@ -1,19 +1,18 @@
 {
-  "name": "jsx-translator",
+  "name": "react-extract",
   "version": "0.0.1",
-  "description": "Extracts messages from JSX files and substitutes translations back in.",
-  "main": "jsx-translator.js",
+  "description": "Extracts messages from JSX files that use react-intl.",
+  "main": "react-extract.js",
   "bin": {
-    "extract-messages": "./bin/extract-messages",
-    "translate": "./bin/translate"
+    "extract-messages": "./bin/react-extract"
   },
   "scripts": {
-    "test": "6to5-node node_modules/.bin/nodeunit tests.js"
-  },  
+    "test": "babel-node node_modules/.bin/nodeunit tests.js"
+  },
   "author": "David McCabe",
   "license": "MIT",
   "dependencies": {
-    "6to5": "^2.5.0",
+    "babel": "^4.7.16",
     "chalk": "^0.5.1",
     "escodegen": "git://github.com/davidmccabe/escodegen",
     "esprima-fb": "^8001.2001.0-dev-harmony-fb",
