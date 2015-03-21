@@ -1,0 +1,26 @@
+{
+  "name": "jsx-translator",
+  "version": "0.0.1",
+  "description": "Extracts messages from JSX files and substitutes translations back in.",
+  "main": "jsx-translator.js",
+  "bin": {
+    "extract-messages": "./bin/extract-messages",
+    "translate": "./bin/translate"
+  },
+  "scripts": {
+    "test": "6to5-node node_modules/.bin/nodeunit tests.js"
+  },  
+  "author": "David McCabe",
+  "license": "MIT",
+  "dependencies": {
+    "6to5": "^2.5.0",
+    "chalk": "^0.5.1",
+    "escodegen": "git://github.com/davidmccabe/escodegen",
+    "esprima-fb": "^8001.2001.0-dev-harmony-fb",
+    "immutable": "^3.6.2",
+    "rw": "^0.1.4"
+  },
+  "devDependencies": {
+    "nodeunit": "^0.9.0"
+  }
+}
